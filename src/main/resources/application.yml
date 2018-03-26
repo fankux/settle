@@ -1,0 +1,10 @@
+server:
+  port: 80
+
+# 默认值为 classpath:/META-INF/resources/,classpath:/resources/,classpath:/public/
+spring:
+  resources:
+    static-locations: classpath:/META-INF/,classpath:/static/
+
+conf:
+  defaultRootPath: E:/a1r/

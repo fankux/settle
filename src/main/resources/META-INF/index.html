@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>Home</title>
+    <link rel="stylesheet" href="css/bootstrap.min.css">
+    <link rel="stylesheet" href="css/baguetteBox.min.css">
+    <link rel="stylesheet" href="css/custom.css">
+    <link rel="stylesheet" href="css/env.css">
+
+    <script type="text/javascript" src="webjars/jquery/jquery.min.js"></script>
+    <script type="text/javascript" src="js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="js/baguetteBox.min.js" async></script>
+    <script type="text/javascript" src="js/masonry.pkgd.min.js"></script>
+    <script type="text/javascript" src="js/imagesloaded.pkgd.min.js"></script>
+    <script type="text/javascript" src="js/inc.js"></script>
+</head>
+
+<body>
+<nav class="nav">
+    <a class="nav-link active" id="homeLink" href="">Home</a>
+</nav>
+<div class="gallery grid" id="imgListField">
+    <div class="grid-sizer"></div>
+    <div class="gutter-sizer"></div>
+</div>
+<button type="button" class="btn btn-light btn-lg btn-block" id="loadingField">加载更多</button>
+
+<script type="text/javascript">
+    var index = 0;
+    var loadFlag = false;
+    var anchor = 0;
+    var imgListField = $('#imgListField');
+    var loadingField = $('#loadingField');
+
+    var grid = imgListField.masonry({
+        itemSelector: '.grid-item',
+        columnWidth: '.grid-sizer',
+        gutter: '.gutter-sizer',
+        horizontalOrder: true,
+        percentPosition: true
+    });
+
+    function renderPage(start, data, encodePath, modUrl, clear) {
+        var historyData = {
+            path: encodePath,
+            data: data,
+            anchor: anchor,
+            index: index
+        };
+
+        if (modUrl && clear) {          // load new list
+            setUrlParam('p', encodePath);
+        }
+        if (clear) {                    // refresh list
+            imgListField.html('<div class="grid-sizer"></div><div class="gutter-sizer"></div>');
+            grid.masonry('reloadItems');
+        } else {                        // append list
+            var currentState = history.state;
+            if (currentState) {
+                historyData.data = currentState.data.concat(historyData.data);
+            }
+        }
+
+        loadFlag = true;
+        if (data.length < 20) {
+            hiddenItem(loadingField);
+        } else {
+            showItem(loadingField);
+        }
+
+        for (var i = 0; i < data.length; ++i) {
+            if (!loadFlag) {
+                break;
+            }
+            var item;
+            if (data[i].type === 1) {
+                item = $('<div class="card grid-item">' +
+                    '<a href="/img' + data[i].src + '?raw=1"><img class="card-img" alt="' + data[i].fileName +
+                    '" title="' + data[i].fileName + '" ' + '" src="/img' + data[i].src + '">' + '</a></div>');
+            } else if (data[i].type === 2) {
+                item = $('<a href="javascript:getPage(0, 20, \'' + data[i].src.replace(/\\/g, '\\\\') +
+                    '\', true, true);"><div class="card grid-item"><div class="card-body">' +
+                    '<h6 class="card-title">' + (start + i) + '.' + data[i].fileName + '</h6></div></a>');
+            } else {
+                continue;
+            }
+
+            grid.masonry().append(item).masonry('appended', item);
+        }
+        index += data.length;
+        historyData.index = index;
+        history.replaceState(historyData, '', '');
+
+        grid.masonry('layout');
+        grid.imagesLoaded().progress(function () {
+            grid.masonry('layout');
+        });
+
+        baguetteBox.run('.gallery', {
+            noScrollbars: true,
+            preload: 3,
+            async: true,
+            onChange: function (currentIndex, imagesCount) {
+                $('#baguetteBox-figure-' + currentIndex).click(function () {
+                    baguetteBox.hide();
+                });
+            }
+        });
+    }
+
+    function getPage(start, size, path, modUrl, clear) {
+        index = start;
+        $(document).attr("title", path);
+        var encodePath = encodeURI(path);
+        $.ajax({
+            url: './api/files?path=' + encodePath + '&s=' + start + '&c=' + size,
+            type: 'POST',
+            dataType: 'json',
+            contentType: 'application/json',
+            success: function (data) {
+                renderPage(start, data, encodePath, modUrl, clear);
+            },
+            error: function (XMLHttpRequest, textStatus, errorThrown) {
+            }
+        });
+    }
+
+    function loadPage(clear) {
+        var params = getUrlParams();
+        if (!params.hasOwnProperty('p')) {
+            getPage(index, 20, '', false, clear);
+        } else {
+            getPage(index, 20, decodeURI(params['p']).replace(/\\/g, '\\\\'), false, clear);
+        }
+    }
+
+    loadPage(true);
+    $(window).bind("popstate", function () {
+        index = 0;
+        loadFlag = false;
+        stopLoadPage();
+        baguetteBox.hide();
+        showItem(loadingField);
+
+        var state = history.state;
+        if (!state) {
+            loadPage(true);
+        } else {
+            renderPage(0, state.data, state.path, false, true);
+        }
+    });
+
+    $(document).ready(function () {
+        $('#homeLink').attr('href', getHost());
+        loadingField.click(function () {
+            // showItem(loadingField);
+            loadPage(false);
+        });
+
+        // $(window).scroll(function () {
+        //     if (Math.ceil($(window).height() + $(document).scrollTop()) >= Math.ceil($(document).height())) {
+        //         showItem(loadingField);
+        //         loadPage(false);
+        //     }
+        // });
+    });
+
+</script>
+
+</body>
+</html>
