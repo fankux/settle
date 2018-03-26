@@ -2,6 +2,7 @@ package com.fankux.service;
 
 import com.google.common.io.Closer;
 import net.coobird.thumbnailator.Thumbnails;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.imageio.ImageIO;
@@ -13,7 +14,11 @@ import java.nio.channels.FileChannel;
 @Service
 public class ImageService {
     private static double SM_SIZE = 400.0;
-    private static String THUMBNAIL_PATH = "E:/thumbnail/";
+    @Value("${conf.thumbnail_path}")
+    private String thumbnail_path;
+
+    @Value("${conf.defaultRootPath}")
+    String defaultRootPath;
 
     String fetchFileNamePrefix(String filePath) {
         int idx;
@@ -56,15 +61,15 @@ public class ImageService {
 
     public boolean fetchThumbnail(String filePath, OutputStream os) {
         String thumbnailFileName = fetchFileNamePrefix(filePath) + "-sm.png";
-        return fetchFile(THUMBNAIL_PATH + thumbnailFileName, os);
+        return fetchFile(thumbnail_path + thumbnailFileName, os);
     }
 
     public boolean genThumbnail(String filePath, OutputStream os) {
         String thumbnailFileName = fetchFileNamePrefix(filePath) + "-sm.png";
-
+        String rootPath = defaultRootPath.substring(0,defaultRootPath.lastIndexOf(":") + 2);
         Closer closer = Closer.create();
         try {
-            FileInputStream fis = closer.register(new FileInputStream("E://" + filePath));
+            FileInputStream fis = closer.register(new FileInputStream(rootPath + filePath));
             BufferedImage bi = ImageIO.read(fis);
             int h = bi.getHeight();
             int w = bi.getWidth();
@@ -87,8 +92,11 @@ public class ImageService {
                 Thumbnails.Builder<BufferedImage> builder = Thumbnails.of(bi).outputQuality(1.0).scale(ratio).outputFormat("png");
                 builder.toOutputStream(os);
 
-                FileOutputStream fos = new FileOutputStream(THUMBNAIL_PATH + thumbnailFileName);
+                FileOutputStream fos = new FileOutputStream(thumbnail_path + thumbnailFileName);
                 builder.toOutputStream(fos);
+            }// 原图小于略缩图尺寸你返回个鸡巴true
+            else{
+                return false;
             }
 
             return true;

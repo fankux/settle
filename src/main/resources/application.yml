@@ -7,4 +7,5 @@ spring:
     static-locations: classpath:/META-INF/,classpath:/static/
 
 conf:
-  defaultRootPath: E:/a1r/
+  defaultRootPath: C:/Users/liu49/Pictures/
+  thumbnail_path: G:/WorkSpace/thumbnail/
