@@ -8,4 +8,4 @@ spring:
 
 conf:
   defaultRootPath: C:/Users/liu49/Pictures/
-  thumbnail_path: G:/WorkSpace/thumbnail/
+  thumbnailPath: G:/WorkSpace/thumbnail/

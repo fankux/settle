@@ -14,7 +14,7 @@ import java.nio.channels.FileChannel;
 @Service
 public class ImageService {
     private static double SM_SIZE = 400.0;
-    @Value("${conf.thumbnail_path}")
+    @Value("${conf.thumbnailPath}")
     private String thumbnail_path;
 
     @Value("${conf.defaultRootPath}")

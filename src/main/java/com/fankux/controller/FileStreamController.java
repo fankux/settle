@@ -33,7 +33,7 @@ public class FileStreamController {
     private static Set<String> ALLOWED_IMAGE_TYPES = Sets.newHashSet();
     @Value("${conf.defaultRootPath}")
     String defaultRootPath;
-    @Value("${conf.thumbnail_path}")
+    @Value("${conf.thumbnailPath}")
     private String thumbnail_path;
 
     static {
