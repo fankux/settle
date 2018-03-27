@@ -1,5 +1,9 @@
 package com.fankux.service;
 
+import cc.eguid.FFmpegCommandManager.FFmpegManager;
+import cc.eguid.FFmpegCommandManager.FFmpegManagerImpl;
+
+import cc.eguid.FFmpegCommandManager.entity.TaskEntity;
 import com.fankux.model.FileItem;
 import com.fankux.model.FileType;
 import com.fankux.util.PathUtils;
@@ -9,8 +13,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Service
 public class FileService {
@@ -71,5 +74,11 @@ public class FileService {
             return Lists.newArrayList();
         }
         return items.subList(start, Math.min(start + count, items.size()));
+    }
+
+
+
+    public void getVideoStream(){
+
     }
 }
