@@ -9,3 +9,4 @@ spring:
 conf:
   defaultRootPath: C:/Users/liu49/Pictures/
   thumbnailPath: G:/WorkSpace/thumbnail/
+  thumbnailImageSize: 400.0

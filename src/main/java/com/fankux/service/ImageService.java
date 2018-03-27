@@ -1,5 +1,6 @@
 package com.fankux.service;
 
+import com.fankux.util.PathUtils;
 import com.google.common.io.Closer;
 import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.beans.factory.annotation.Value;
@@ -13,14 +14,17 @@ import java.nio.channels.FileChannel;
 
 @Service
 public class ImageService {
-    private static double SM_SIZE = 400.0;
+
     @Value("${conf.thumbnailPath}")
-    private String thumbnail_path;
+    private String thumbnailPath;
 
     @Value("${conf.defaultRootPath}")
-    String defaultRootPath;
+    private String defaultRootPath;
 
-    String fetchFileNamePrefix(String filePath) {
+    @Value("${conf.thumbnailImageSize}")
+    private Double thumbnailImageSize;
+
+    private String fetchFileNamePrefix(String filePath) {
         int idx;
         String prefix = filePath;
         idx = filePath.lastIndexOf('.');
@@ -55,21 +59,41 @@ public class ImageService {
         }
     }
 
-    public void fetchImage(String filePath, OutputStream os) {
-        fetchFile(filePath, os);
+    /**
+     * 获得原图
+     *
+     * @param filePath 相对路径
+     * @param os       输出流
+     */
+    public boolean fetchImage(String filePath, OutputStream os) {
+        defaultRootPath = PathUtils.padSuffixSlash(defaultRootPath);
+        return fetchFile(defaultRootPath + filePath, os);
     }
 
+    /**
+     * 获得缩略图
+     *
+     * @param filePath 相对路径
+     * @param os       输出流
+     */
     public boolean fetchThumbnail(String filePath, OutputStream os) {
         String thumbnailFileName = fetchFileNamePrefix(filePath) + "-sm.png";
-        return fetchFile(thumbnail_path + thumbnailFileName, os);
+        thumbnailPath = PathUtils.padSuffixSlash(thumbnailPath);
+        return fetchFile(thumbnailPath + thumbnailFileName, os);
     }
 
+    /**
+     * 生成缩略图, 并直接返回缩略图的输出流
+     *
+     * @param filePath 相对路径
+     * @param os       输出流
+     */
     public boolean genThumbnail(String filePath, OutputStream os) {
         String thumbnailFileName = fetchFileNamePrefix(filePath) + "-sm.png";
-        String rootPath = defaultRootPath.substring(0,defaultRootPath.lastIndexOf(":") + 2);
         Closer closer = Closer.create();
         try {
-            FileInputStream fis = closer.register(new FileInputStream(rootPath + filePath));
+            defaultRootPath = PathUtils.padSuffixSlash(defaultRootPath);
+            FileInputStream fis = closer.register(new FileInputStream(defaultRootPath + filePath));
             BufferedImage bi = ImageIO.read(fis);
             int h = bi.getHeight();
             int w = bi.getWidth();
@@ -77,13 +101,13 @@ public class ImageService {
             boolean flag = false;
             double ratio = 1.0;
             if (h >= w) {
-                if (w > SM_SIZE) {
-                    ratio = SM_SIZE / w;
+                if (w > thumbnailImageSize) {
+                    ratio = thumbnailImageSize / w;
                     flag = true;
                 }
             } else {
-                if (h > SM_SIZE) {
-                    ratio = SM_SIZE / h;
+                if (h > thumbnailImageSize) {
+                    ratio = thumbnailImageSize / h;
                     flag = true;
                 }
             }
@@ -92,13 +116,11 @@ public class ImageService {
                 Thumbnails.Builder<BufferedImage> builder = Thumbnails.of(bi).outputQuality(1.0).scale(ratio).outputFormat("png");
                 builder.toOutputStream(os);
 
-                FileOutputStream fos = new FileOutputStream(thumbnail_path + thumbnailFileName);
+                thumbnailPath = PathUtils.padSuffixSlash(thumbnailPath);
+                FileOutputStream fos = new FileOutputStream(thumbnailPath + thumbnailFileName);
                 builder.toOutputStream(fos);
-            }// 原图小于略缩图尺寸你返回个鸡巴true
-            else{
-                return false;
             }
-
+            // 原图小于略缩图尺寸, 直接用原图
             return true;
         } catch (IOException e) {
             return false;

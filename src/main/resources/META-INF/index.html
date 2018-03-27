@@ -83,7 +83,7 @@
             } else if (data[i].type === 2) {
                 item = $('<a href="javascript:getPage(0, 20, \'' + data[i].src.replace(/\\/g, '\\\\') +
                     '\', true, true);"><div class="card grid-item"><div class="card-body">' +
-                    '<h6 class="card-title">' + (start + i) + '.' + data[i].fileName + '</h6></div></a>');
+                    '<h6 class="card-title">' + data[i].fileName + '</h6></div></a>');
             } else {
                 continue;
             }

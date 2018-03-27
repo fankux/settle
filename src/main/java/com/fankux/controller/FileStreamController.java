@@ -1,14 +1,13 @@
 package com.fankux.controller;
 
 import com.fankux.service.ImageService;
+import com.fankux.util.PathUtils;
 import com.google.common.collect.Sets;
 import com.google.common.io.Closer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Controller;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -31,10 +30,6 @@ public class FileStreamController {
     private ImageService imageService;
 
     private static Set<String> ALLOWED_IMAGE_TYPES = Sets.newHashSet();
-    @Value("${conf.defaultRootPath}")
-    String defaultRootPath;
-    @Value("${conf.thumbnailPath}")
-    private String thumbnail_path;
 
     static {
         ALLOWED_IMAGE_TYPES.add(MediaType.IMAGE_JPEG_VALUE);
@@ -49,19 +44,26 @@ public class FileStreamController {
         try {
             String filePath = request.getRequestURI().replace("/img", "");
             filePath = URLDecoder.decode(filePath, Charset.forName("UTF8").name());
-            filePath = StringUtils.trimLeadingCharacter(filePath, '/');
-            // 日你妈哦URI我怎么去拿绝对路径的值，你瞎几把写就别怪我蛇皮走位了！
-            String rootPath = defaultRootPath.substring(0, defaultRootPath.lastIndexOf(":") + 2);
+            filePath = PathUtils.clearPrefixSlash(filePath);
             ServletOutputStream os = closer.register(response.getOutputStream());
+
+            /*
+             * 如果是原图请求, 直接获取原图
+             * 然后, 尝试获得缩略图, 存在则返回缩略图
+             * 然后, 尝试生成缩略图, 并返回缩略图
+             * 最后, 返回原图
+             */
             if (raw != null && raw == 1) {
 //                logger.info("{} raw fetch", filePath);
-                imageService.fetchImage(rootPath + filePath, os);
+                imageService.fetchImage(filePath, os);
             } else if (imageService.fetchThumbnail(filePath, os)) {
 //                logger.info("{} thumbnail fetch", filePath);
             } else if (imageService.genThumbnail(filePath, os)) {
 //                logger.info("{} thumbnail generate", filePath);
             } else {
-                imageService.fetchImage(rootPath + filePath, os);
+                if (!imageService.fetchImage(filePath, os)) {
+                    throw new IOException("打开原图失败");
+                }
             }
             response.flushBuffer();
             response.setStatus(HttpServletResponse.SC_OK);
