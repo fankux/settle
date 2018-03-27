@@ -4,12 +4,8 @@ import org.springframework.util.StringUtils;
 
 public class PathUtils {
     static public String cleanfix(String path) {
-        // for windows, remove driver name
-        int idx;
-        if ((idx = path.indexOf(':')) != -1) {
-            path = path.substring(idx + 1);
-        }
-        return path;
+        // for windows, modify slash
+        return path.replaceAll("\\\\", "/").replaceAll("//", "/");
     }
 
     static public String padSuffixSlash(String path) {
@@ -17,6 +13,7 @@ public class PathUtils {
             return "/";
         }
 
+        path = cleanfix(path);
         if (path.charAt(path.length() - 1) != '/') {
             path += '/';
         }
@@ -28,6 +25,7 @@ public class PathUtils {
             return "/";
         }
 
+        path = cleanfix(path);
         if (path.charAt(0) != '/') {
             path = '/' + path;
         }
@@ -38,6 +36,8 @@ public class PathUtils {
         if (StringUtils.isEmpty(path)) {
             return "";
         }
+
+        path = cleanfix(path);
         path = StringUtils.trimLeadingCharacter(path, '/');
         return path;
     }

@@ -41,7 +41,8 @@ public class FileService {
         List<FileItem> items = Lists.newArrayList();
         for (File f : files) {
             int idx;
-            String filePath = PathUtils.padPrefixSlash(f.getPath().replace(defaultRootPath, ""));
+            String filePath = PathUtils.cleanfix(f.getPath());
+            filePath = PathUtils.padPrefixSlash(filePath.replace(defaultRootPath, ""));
             FileItem item = new FileItem();
             if (f.isDirectory()) {
                 item.setFileName(f.getName());
@@ -77,8 +78,7 @@ public class FileService {
     }
 
 
-
-    public void getVideoStream(){
+    public void getVideoStream() {
 
     }
 }

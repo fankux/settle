@@ -22,3 +22,9 @@ nbbuild/
 dist/
 nbdist/
 .nb-gradle/
+
+.a
+.o
+.dll
+.exe
+ffmpeg/
