@@ -6,7 +6,24 @@ spring:
   resources:
     static-locations: classpath:/META-INF/,classpath:/static/
 
-conf:
-  defaultRootPath: C:/Users/liu49/Pictures/
-  thumbnailPath: G:/WorkSpace/thumbnail/
-  thumbnailImageSize: 400.0
+settle:
+  conf:
+    thumbnailImageSize: 400.0
+
+---
+spring:
+  profiles: fankux
+
+settle:
+  conf:
+    defaultRootPath: E:/a1r/
+    thumbnailPath: E:/thumbnail/
+
+---
+spring:
+  profiles: llzzll
+
+settle:
+  conf:
+    defaultRootPath: C:/Users/liu49/Pictures/
+    thumbnailPath: G:/WorkSpace/thumbnail/

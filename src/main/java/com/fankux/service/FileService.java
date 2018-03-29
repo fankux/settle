@@ -26,7 +26,7 @@ public class FileService {
         ALLOWED_IMAGE_TYPES.add("gif");
     }
 
-    @Value("${conf.defaultRootPath}")
+    @Value("${settle.conf.defaultRootPath}")
     String defaultRootPath;
 
     public List<FileItem> fileList(String path, Integer start, Integer count) {

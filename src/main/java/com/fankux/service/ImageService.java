@@ -15,13 +15,13 @@ import java.nio.channels.FileChannel;
 @Service
 public class ImageService {
 
-    @Value("${conf.thumbnailPath}")
+    @Value("${settle.conf.thumbnailPath}")
     private String thumbnailPath;
 
-    @Value("${conf.defaultRootPath}")
+    @Value("${settle.conf.defaultRootPath}")
     private String defaultRootPath;
 
-    @Value("${conf.thumbnailImageSize}")
+    @Value("${settle.conf.thumbnailImageSize}")
     private Double thumbnailImageSize;
 
     private String fetchFileNamePrefix(String filePath) {
