@@ -1,18 +1,32 @@
+# 通用配置
 server:
-  port: 80
+  port: 8080
 
 # 默认值为 classpath:/META-INF/resources/,classpath:/resources/,classpath:/public/
 spring:
   resources:
     static-locations: classpath:/META-INF/,classpath:/static/
 
+mybatis:
+  config-locations: classpath:mybatis-config.xml
+  mapper-locations: classpath:mapper/*.xml
+  type-aliases-package: com.fankux.model
+
 settle:
   conf:
     thumbnailImageSize: 400.0
 
+
+#分profile配置
 ---
 spring:
   profiles: fankux
+
+  datasource:
+    driver-class-name: org.sqlite.JDBC
+    url: jdbc:sqlite:/Users/fankux/dev/settle/store.db
+    username: root
+    password: fast
 
 settle:
   conf:
@@ -22,6 +36,12 @@ settle:
 ---
 spring:
   profiles: llzzll
+
+datasource:
+  driver-class-name: org.sqlite.JDBC
+  url: jdbc:sqlite:/Users/fankux/dev/settle/store.db
+  username: root
+  password: fast
 
 settle:
   conf:

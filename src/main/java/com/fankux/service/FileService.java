@@ -4,6 +4,7 @@ import cc.eguid.FFmpegCommandManager.FFmpegManager;
 import cc.eguid.FFmpegCommandManager.FFmpegManagerImpl;
 
 import cc.eguid.FFmpegCommandManager.entity.TaskEntity;
+import com.fankux.dao.FileDao;
 import com.fankux.model.FileItem;
 import com.fankux.model.FileType;
 import com.fankux.util.PathUtils;
@@ -12,11 +13,18 @@ import com.google.common.collect.Sets;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.Resource;
 import java.io.File;
 import java.util.*;
 
 @Service
 public class FileService {
+    @Value("${settle.conf.defaultRootPath}")
+    String defaultRootPath;
+
+    @Resource
+    FileDao fileDao;
+
     private static Set<String> ALLOWED_IMAGE_TYPES = Sets.newHashSet();
 
     static {
@@ -25,9 +33,6 @@ public class FileService {
         ALLOWED_IMAGE_TYPES.add("jpeg");
         ALLOWED_IMAGE_TYPES.add("gif");
     }
-
-    @Value("${settle.conf.defaultRootPath}")
-    String defaultRootPath;
 
     public List<FileItem> fileList(String path, Integer start, Integer count) {
         defaultRootPath = PathUtils.padSuffixSlash(defaultRootPath);

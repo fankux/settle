@@ -27,4 +27,6 @@ nbdist/
 .o
 .dll
 .exe
+*.db
 ffmpeg/
+

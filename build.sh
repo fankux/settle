@@ -17,3 +17,5 @@ rm -f ffmpeg.tar.gz
 
 # compile project
 #mvn clean package -Dmaven.skip.test=true
+
+# -Drun.profiles=fankux
