@@ -1,6 +1,6 @@
 package com.fankux.dao;
 
-import com.fankux.model.FileItem;
+import com.fankux.entity.FileItem;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
@@ -12,4 +12,6 @@ public interface FileDao {
                                   @Param("count") Integer count);
 
     int insert(FileItem item);
+
+    int deleteByPath(@Param("path") String path);
 }

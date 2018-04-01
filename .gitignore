@@ -23,10 +23,12 @@ dist/
 nbdist/
 .nb-gradle/
 
-.a
-.o
-.dll
-.exe
+*.a
+*.o
+*.so
+*.dll
+*.exe
 *.db
 ffmpeg/
+*.jnilib
 

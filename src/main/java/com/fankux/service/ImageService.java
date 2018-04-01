@@ -6,6 +6,7 @@ import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
@@ -23,6 +24,11 @@ public class ImageService {
 
     @Value("${settle.conf.thumbnailImageSize}")
     private Double thumbnailImageSize;
+
+    @PostConstruct
+    private void init() {
+        defaultRootPath = PathUtils.padSuffixSlash(defaultRootPath);
+    }
 
     private String fetchFileNamePrefix(String filePath) {
         int idx;
@@ -66,7 +72,6 @@ public class ImageService {
      * @param os       输出流
      */
     public boolean fetchImage(String filePath, OutputStream os) {
-        defaultRootPath = PathUtils.padSuffixSlash(defaultRootPath);
         return fetchFile(defaultRootPath + filePath, os);
     }
 
@@ -92,7 +97,6 @@ public class ImageService {
         String thumbnailFileName = fetchFileNamePrefix(filePath) + "-sm.png";
         Closer closer = Closer.create();
         try {
-            defaultRootPath = PathUtils.padSuffixSlash(defaultRootPath);
             FileInputStream fis = closer.register(new FileInputStream(defaultRootPath + filePath));
             BufferedImage bi = ImageIO.read(fis);
             int h = bi.getHeight();

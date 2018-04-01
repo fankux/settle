@@ -2,18 +2,33 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.fankux.dao.FileDao">
+    <resultMap id="FileItemResultMap" type="FileItem">
+        <result typeHandler="com.fankux.dao.typeHandler.DateHandler" column="updateTime" javaType="java.util.Date"
+                jdbcType="VARCHAR" property="updateTime"/>
+    </resultMap>
 
-    <select id="selectDirItems" resultType="FileItem">
+    <select id="selectDirItems" resultMap="FileItemResultMap">
         SELECT
+          id,
           type,
-          path AS src,
-          name AS fileName
-        FROM file;
+          path,
+          file_name AS fileName,
+          update_time AS updateTime
+        FROM file
+        WHERE path = #{path}
+        LIMIT ${start}, ${count};
     </select>
 
     <insert id="insert" parameterType="FileItem" keyProperty="id" useGeneratedKeys="true">
-      INSERT INTO file ('path', 'name', 'type')
-      VALUES (#{src}, #{fileName}, #{type});
+      INSERT OR IGNORE INTO file
+        ('type', 'path', 'file_name', 'update_time')
+      VALUES
+        (#{type}, #{path}, #{fileName}, datetime('now'));
     </insert>
+
+    <delete id="deleteByPath">
+      DELETE FROM file WHERE path = #{path}
+    </delete>
+
 
 </mapper>

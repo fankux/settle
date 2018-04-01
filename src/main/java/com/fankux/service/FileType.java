@@ -1,4 +1,4 @@
-package com.fankux.model;
+package com.fankux.service;
 
 public enum FileType {
     FILE(1),

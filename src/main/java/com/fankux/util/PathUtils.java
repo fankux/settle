@@ -4,6 +4,9 @@ import org.springframework.util.StringUtils;
 
 public class PathUtils {
     static public String cleanfix(String path) {
+        if (StringUtils.isEmpty(path)) {
+            return "";
+        }
         // for windows, modify slash
         return path.replaceAll("\\\\", "/").replaceAll("//", "/");
     }

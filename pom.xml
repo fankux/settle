@@ -80,6 +80,11 @@
             <artifactId>thumbnailator</artifactId>
             <version>0.4.3</version>
         </dependency>
+        <dependency>
+            <groupId>net.contentobjects.jnotify</groupId>
+            <artifactId>jnotify</artifactId>
+            <version>0.94</version>
+        </dependency>
 
         <!-- logging  -->
         <dependency>

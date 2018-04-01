@@ -1,9 +1,20 @@
 package com.fankux.model;
 
-public class FileItem {
+import com.fankux.entity.FileItem;
+import com.fankux.util.PathUtils;
+
+public class FileResponse {
     private String fileName;
     private String src;
     private Integer type;
+
+    public static FileResponse buildFrom(FileItem item) {
+        FileResponse response = new FileResponse();
+        response.setType(item.getType());
+        response.setSrc(PathUtils.padSuffixSlash(item.getPath()) + item.getFileName());
+        response.setFileName(item.getFileName());
+        return response;
+    }
 
     public String getFileName() {
         return fileName;

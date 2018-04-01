@@ -3,6 +3,7 @@
 
 <configuration>
     <typeAliases>
-        <typeAlias alias="FileItem" type="com.fankux.model.FileItem"/>
+        <typeAlias alias="FileItem" type="com.fankux.entity.FileItem"/>
+        <typeAlias alias="PathItem" type="com.fankux.entity.PathItem"/>
     </typeAliases>
 </configuration>

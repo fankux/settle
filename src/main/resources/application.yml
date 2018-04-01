@@ -1,6 +1,6 @@
 # 通用配置
 server:
-  port: 8080
+  port: 80
 
 # 默认值为 classpath:/META-INF/resources/,classpath:/resources/,classpath:/public/
 spring:
@@ -10,7 +10,8 @@ spring:
 mybatis:
   config-locations: classpath:mybatis-config.xml
   mapper-locations: classpath:mapper/*.xml
-  type-aliases-package: com.fankux.model
+  type-aliases-package: com.fankux.entity
+  type-handlers-package: com.fankux.dao
 
 settle:
   conf:
@@ -24,7 +25,7 @@ spring:
 
   datasource:
     driver-class-name: org.sqlite.JDBC
-    url: jdbc:sqlite:/Users/fankux/dev/settle/store.db
+    url: jdbc:sqlite:C:/Users/Fankux/Desktop/settle/store/store.db
     username: root
     password: fast
 
@@ -32,6 +33,7 @@ settle:
   conf:
     defaultRootPath: E:/a1r/
     thumbnailPath: E:/thumbnail/
+    libPath: C:/Users/Fankux/Desktop/settle/lib
 
 ---
 spring:
@@ -47,3 +49,4 @@ settle:
   conf:
     defaultRootPath: C:/Users/liu49/Pictures/
     thumbnailPath: G:/WorkSpace/thumbnail/
+    libPath: C:/Users/Fankux/Desktop/settle/lib
