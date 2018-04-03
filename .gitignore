@@ -29,6 +29,7 @@ nbdist/
 *.dll
 *.exe
 *.db
-ffmpeg/
 *.jnilib
+
+ffmpeg/
 

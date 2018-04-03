@@ -2,8 +2,12 @@
 <!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" "http://mybatis.org/dtd/mybatis-3-config.dtd">
 
 <configuration>
+    <settings>
+        <setting name="logImpl" value="SLF4J" />
+    </settings>
+
     <typeAliases>
-        <typeAlias alias="FileItem" type="com.fankux.entity.FileItem"/>
-        <typeAlias alias="PathItem" type="com.fankux.entity.PathItem"/>
+        <typeAlias alias="FileItem" type="com.fl.entity.FileItem"/>
+        <typeAlias alias="PathItem" type="com.fl.entity.PathItem"/>
     </typeAliases>
 </configuration>

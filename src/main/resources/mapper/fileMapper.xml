@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
-<mapper namespace="com.fankux.dao.FileDao">
+<mapper namespace="com.fl.dao.FileDao">
     <resultMap id="FileItemResultMap" type="FileItem">
-        <result typeHandler="com.fankux.dao.typeHandler.DateHandler" column="updateTime" javaType="java.util.Date"
+        <result typeHandler="com.fl.dao.typeHandler.DateHandler" column="updateTime" javaType="java.util.Date"
                 jdbcType="VARCHAR" property="updateTime"/>
     </resultMap>
 
@@ -26,9 +26,36 @@
         (#{type}, #{path}, #{fileName}, datetime('now'));
     </insert>
 
+    <delete id="delete" parameterType="FileItem">
+        DELETE FROM file
+        <where>
+            <if test="path">
+                AND path = #{path}
+            </if>
+            <if test="fileName">
+                AND file_name = #{fileName}
+            </if>
+            <if test="type">
+                AND type = #{type}
+            </if>
+        </where>
+    </delete>
+
     <delete id="deleteByPath">
       DELETE FROM file WHERE path = #{path}
     </delete>
 
+    <update id="update">
+        UPDATE file
+        SET
+            update_time = datetime('now'),
+            type = #{new.type},
+            path = #{new.path},
+            file_name = #{new.fileName}
+        WHERE
+            type = #{old.type}
+            AND path = #{old.path}
+            AND file_name = #{old.fileName}
+    </update>
 
 </mapper>
