@@ -20,4 +20,9 @@ public class FileApiController {
                                 @RequestParam("c") Integer count) {
         return fileService.fileList(path, start, count);
     }
+
+    Boolean fileRename(@RequestParam("path") String path, @RequestParam("name") String name,
+                       @RequestParam("newName") String newName) {
+        return fileService.fileRename(path, name, newName);
+    }
 }

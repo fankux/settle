@@ -1,5 +1,6 @@
 package com.fl.controller;
 
+import com.fl.service.ImageResult;
 import com.fl.service.ImageService;
 import com.fl.util.PathUtils;
 import com.google.common.collect.Sets;
@@ -53,23 +54,37 @@ public class FileStreamController {
              * 然后, 尝试生成缩略图, 并返回缩略图
              * 最后, 返回原图
              */
+            boolean done = false;
+            int httpRet = HttpServletResponse.SC_OK;
             if (raw != null && raw == 1) {
-//                logger.info("{} raw fetch", filePath);
-                imageService.fetchImage(filePath, os);
-            } else if (imageService.fetchThumbnail(filePath, os)) {
-//                logger.info("{} thumbnail fetch", filePath);
-            } else if (imageService.genThumbnail(filePath, os)) {
-//                logger.info("{} thumbnail generate", filePath);
-            } else {
+                if (!imageService.fetchImage(filePath, os)) {
+                    throw new IOException("获取原图失败");
+                }
+                done = true;
+            }
+
+            if (!done) {
+                done = imageService.fetchThumbnail(filePath, os);
+            }
+
+            if (!done) {
+                ImageResult imgRet = imageService.genThumbnail(filePath, os);
+                if (imgRet == ImageResult.FAIL) {
+                    throw new IOException("生成缩略图失败");
+                }
+                done = imgRet != ImageResult.IGNORE;
+            }
+
+            if (!done) {
                 if (!imageService.fetchImage(filePath, os)) {
                     throw new IOException("打开原图失败");
                 }
             }
             response.flushBuffer();
-            response.setStatus(HttpServletResponse.SC_OK);
+            response.setStatus(httpRet);
 
         } catch (IOException e) {
-            response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+            response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         } finally {
             try {
                 closer.close();

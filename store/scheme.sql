@@ -3,6 +3,8 @@ CREATE TABLE "file" (
   "type" integer NOT NULL,
   "path" text NOT NULL DEFAULT '',
   "file_name" text NOT NULL DEFAULT '',
+  "mtime" integer NOT NULL,
+  "extra_info" text NOT NULL DEFAULT '',
   "update_time" text NOT NULL
 );
 

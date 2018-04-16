@@ -7,12 +7,14 @@ public class FileResponse {
     private String fileName;
     private String src;
     private Integer type;
+    private String extraInfo;
 
     public static FileResponse buildFrom(FileItem item) {
         FileResponse response = new FileResponse();
         response.setType(item.getType());
         response.setSrc(PathUtils.padSuffixSlash(item.getPath()) + item.getFileName());
         response.setFileName(item.getFileName());
+        response.setExtraInfo(item.getExtraInfo());
         return response;
     }
 
@@ -38,5 +40,13 @@ public class FileResponse {
 
     public void setType(Integer type) {
         this.type = type;
+    }
+
+    public String getExtraInfo() {
+        return extraInfo;
+    }
+
+    public void setExtraInfo(String extraInfo) {
+        this.extraInfo = extraInfo;
     }
 }

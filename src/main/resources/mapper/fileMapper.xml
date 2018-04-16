@@ -7,24 +7,51 @@
                 jdbcType="VARCHAR" property="updateTime"/>
     </resultMap>
 
+    <select id="selectDirItemCount" resultType="int">
+        SELECT COUNT(*) FROM file WHERE path = #{path}
+    </select>
+
     <select id="selectDirItems" resultMap="FileItemResultMap">
         SELECT
-          id,
-          type,
-          path,
-          file_name AS fileName,
-          update_time AS updateTime
+        id,
+        type,
+        path,
+        file_name AS fileName,
+        mtime,
+        extra_info AS extraInfo,
+        update_time AS updateTime
         FROM file
         WHERE path = #{path}
-        LIMIT ${start}, ${count};
+        <if test="start != null and count != null">
+            LIMIT ${start}, ${count};
+        </if>
+        <if test="start != null and count == null">
+            LIMIT ${start}
+        </if>
     </select>
 
     <insert id="insert" parameterType="FileItem" keyProperty="id" useGeneratedKeys="true">
       INSERT OR IGNORE INTO file
-        ('type', 'path', 'file_name', 'update_time')
+        ('type', 'path', 'file_name', 'mtime', 'extra_info', 'update_time')
       VALUES
-        (#{type}, #{path}, #{fileName}, datetime('now'));
+        (#{type}, #{path}, #{fileName}, #{mtime}, #{extraInfo}, datetime('now'));
     </insert>
+
+    <insert id="insertBatch" parameterType="FileItem" keyProperty="id" useGeneratedKeys="true">
+        INSERT OR IGNORE INTO file
+        ('type', 'path', 'file_name', 'mtime', 'extra_info', 'update_time')
+        VALUES
+        <foreach collection="collection" separator="," item="item" index="index">
+            (#{item.type}, #{item.path}, #{item.fileName}, #{item.mtime}, #{item.extraInfo}, datetime('now'))
+        </foreach>
+    </insert>
+
+    <delete id="deleteByIds">
+        DELETE FROM file WHERE id IN
+        <foreach collection="collection" open="(" close=")" separator="," index="index" item="item">
+            #{item}
+        </foreach>
+    </delete>
 
     <delete id="delete" parameterType="FileItem">
         DELETE FROM file
@@ -51,11 +78,23 @@
             update_time = datetime('now'),
             type = #{new.type},
             path = #{new.path},
-            file_name = #{new.fileName}
+            file_name = #{new.fileName},
+            mtime = #{new.mtime}
         WHERE
-            type = #{old.type}
-            AND path = #{old.path}
+            path = #{old.path}
             AND file_name = #{old.fileName}
+    </update>
+
+    <update id="updateById">
+        UPDATE file
+        SET
+            update_time = datetime('now'),
+            type = #{item.type},
+            path = #{item.path},
+            file_name = #{item.fileName},
+            mtime = #{item.mtime}
+        WHERE
+            id = #{id}
     </update>
 
 </mapper>

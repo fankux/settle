@@ -35,7 +35,7 @@ spring:
 
 settle:
   conf:
-    defaultRootPath: E:/a1r/
+    defaultRootPath: E:/Pictures/Hash
     thumbnailPath: E:/thumbnail/
     libPath: C:/Users/Fankux/Desktop/settle/lib
 

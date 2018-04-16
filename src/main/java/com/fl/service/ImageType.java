@@ -1,12 +1,11 @@
 package com.fl.service;
 
-public enum FileType {
-    FILE(1),
-    DIR(2),
-    IMG(3),
-    VIDEO(4);
+public enum ImageType {
+    JPG(1),
+    PNG(2),
+    GIF(3);
 
-    FileType(Integer code) {
+    ImageType(Integer code) {
         this.code = code;
     }
 

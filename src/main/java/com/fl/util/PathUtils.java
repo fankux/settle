@@ -26,6 +26,11 @@ public class PathUtils {
         return path;
     }
 
+    static public String extension(String path) {
+        cleanfix(path);
+        return FilenameUtils.getExtension(path);
+    }
+
     static public String padSuffixSlash(String path) {
         if (path == null || path.isEmpty()) {
             return "/";
