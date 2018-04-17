@@ -22,6 +22,7 @@
         update_time AS updateTime
         FROM file
         WHERE path = #{path}
+        ORDER BY type DESC
         <if test="start != null and count != null">
             LIMIT ${start}, ${count};
         </if>

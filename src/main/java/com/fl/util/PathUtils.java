@@ -28,7 +28,7 @@ public class PathUtils {
 
     static public String extension(String path) {
         cleanfix(path);
-        return FilenameUtils.getExtension(path);
+        return FilenameUtils.getExtension(path).toLowerCase();
     }
 
     static public String padSuffixSlash(String path) {

@@ -14,19 +14,38 @@
     <script type="text/javascript" src="webjars/bootstrap/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="webjars/masonry/masonry.pkgd.min.js"></script>
     <script type="text/javascript" src="webjars/imagesloaded/imagesloaded.pkgd.min.js"></script>
+    <script type="text/javascript" src="webjars/velocity/velocity.min.js"></script>
     <script type="text/javascript" src="js/baguetteBox.min.js" async></script>
     <script type="text/javascript" src="js/inc.js"></script>
 </head>
 
 <body>
-<ol class="breadcrumb" style="margin-bottom: 5px;" id="pagePos">
-    <li><a href="javascript:void(0);" id="homeLink">Home</a></li>
-</ol>
-<div class="gallery grid" id="imgListField">
-    <div class="grid-sizer" id="gridSizer"></div>
-    <div class="gutter-sizer"></div>
+<header class="nav sticky-top page-nav page-nav-flat" id="pageNav">
+    <button class="navbar-toggler sidebar-toggler" id="sidebarToggler" type="button" data-toggle="collapse"
+            data-target="#exCollapsingNavbar">
+        &#9776;
+    </button>
+    <ol class="breadcrumb" id="pagePos">
+        <li class="breadcrumb-item"><a href="javascript:void(0);" id="homeLink">Home</a></li>
+    </ol>
+</header>
+<div class="container-fluid d-flex">
+    <nav class="col-12 col-md-3 col-lg-2 col-xl-2 flex-column sidebar" id="sidebar">
+        <ul class="nav flex-column sidebar-nav">
+            <li class="nav-item">aaaaaaaaaaaaaaaaaa</li>
+        </ul>
+    </nav>
+    <main class="col-12 col-md-9 col-lg-10 col-xl-10 main-page" id="mainPage">
+        <div class="gallery grid" id="imgListField">
+            <div class="grid-sizer" id="gridSizer"></div>
+            <div class="gutter-sizer"></div>
+        </div>
+    </main>
+    <aside class="hide"></aside>
 </div>
-<button type="button" class="btn btn-light btn-lg btn-block" id="loadingField">加载更多</button>
+<footer class="d-flex" id="footer">
+    <button type="button" class="btn btn-light btn-lg btn-block" id="loadingField">加载更多</button>
+</footer>
 
 <script type="text/javascript">
     var index = 0;
@@ -39,22 +58,21 @@
         itemSelector: '.grid-item',
         columnWidth: '.grid-sizer',
         gutter: '.gutter-sizer',
-        horizontalOrder: true,
-        percentPosition: true
+        horizontalOrder: true
     });
 
     function genPagePosition(encodePath) {
         var pagePos = $('#pagePos');
-        pagePos.html('<li><a href="' + getHost() + '" id="homeLink">Home</a></li>');
+        pagePos.html('<li><a href="' + getHost() + '" class="breadcrumb-item" id="homeLink">Home</a></li>');
 
         var secPath = '';
         var sec = decodeURI(encodePath).split('/');
         for (var i = 0; i < sec.length; ++i) {
             if (i === sec.length - 1) {
-                pagePos.append($('<li class="active">' + sec[i] + '</li>'));
+                pagePos.append($('<li class="breadcrumb-item active">' + sec[i] + '</li>'));
             } else {
-                pagePos.append($('<li><a href="javascript:getPage(0, 20, \'' + secPath.replace(/\\/g, '\\\\') +
-                    '\', true, true);">' + sec[i] + '</a></li>'));
+                pagePos.append($('<li class="breadcrumb-item"><a href="javascript:getPage(0, 20, \'' +
+                    secPath.replace(/\\/g, '\\\\') + '\', true, true);">' + sec[i] + '</a></li>'));
                 secPath += '/' + sec[i];
             }
         }
@@ -120,9 +138,9 @@
                     var h = w * extraInfo.smHeight / extraInfo.smWidth;
 
                     item = $('<div class="card grid-item">' +
-                        '<a href="/img' + data[i].src + '?raw=1"><img class="card-img thumbnail-size" alt="' +
-                        data[i].fileName + '" title="' + data[i].fileName + '" ' +
-                        '" width="' + w + '" height="' + h + '" src="/img' + data[i].src + '">' + '</a></div>');
+                        '<a href="/img' + data[i].src + '?raw=1"><img class="card-img thumbnail-img" alt="' +
+                        data[i].fileName + '" title="' + data[i].fileName + '" width="' + w + '" height="' + h +
+                        '" src="/img' + data[i].src + '" id="img-' + (index + i) + '">' + '</a></div>');
 
                     grid.masonry().append(item).masonry('appended', item);
                 }
@@ -136,6 +154,9 @@
         // grid.imagesLoaded().progress(function () {
         //     grid.masonry('layout');
         // });
+
+        // remove specify size for image auto layout after
+        $('.thumbnail-img').removeAttr('width').removeAttr('height');
 
         baguetteBox.run('.gallery', {
             noScrollbars: true,
@@ -175,7 +196,21 @@
         }
     }
 
-    loadPage(true);
+    /**
+     * clear image list, load from server or history state
+     */
+    function reRenderPage() {
+        var state = history.state;
+        if (!state) {
+            loadPage(true);
+        } else {
+            renderPage(0, state.data, state.path, false, true);
+        }
+    }
+
+    function layoutMainPage() {
+        grid.masonry('layout');
+    }
 
     // page back
     $(window).bind("popstate", function () {
@@ -185,12 +220,7 @@
         baguetteBox.hide();
         showItem(loadingField);
 
-        var state = history.state;
-        if (!state) {
-            loadPage(true);
-        } else {
-            renderPage(0, state.data, state.path, false, true);
-        }
+        reRenderPage();
     });
 
     // window resize
@@ -200,28 +230,62 @@
             clearTimeout(resizeTm);
         }
         resizeTm = setTimeout(function () {
-            var state = history.state;
-            if (!state) {
-                loadPage(true);
-            } else {
-                renderPage(0, state.data, state.path, false, true);
-            }
+            layoutMainPage();
         }, 200);
     });
 
     $(document).ready(function () {
         $('#homeLink').attr('href', getHost());
+        loadPage(true);
+
         loadingField.click(function () {
             // showItem(loadingField);
             loadPage(false);
         });
 
-        // $(window).scroll(function () {
-        //     if (Math.ceil($(window).height() + $(document).scrollTop()) >= Math.ceil($(document).height())) {
-        //         showItem(loadingField);
-        //         loadPage(false);
-        //     }
-        // });
+        // toggle sidebar
+        var mainPageClass = 'col-12 col-md-9 col-lg-10 col-xl-10 main-page';
+        var mainPageClassMax = 'col-12 main-page';
+        var sidebar = $('#sidebar');
+        $('#sidebarToggler').click(function () {
+            if (sidebar.css("display") === 'none') {
+                sidebar.css('display', 'block');
+                sidebar.velocity({translateX: ['0%', '-100%']}, {
+                    duration: 300,
+                    complete: function () {
+                        $('#mainPage').attr('class', mainPageClass);
+                        layoutMainPage();
+                    }
+                });
+            } else {
+                sidebar.velocity({translateX: '-100%'}, {
+                    duration: 300,
+                    complete: function () {
+                        sidebar.css('display', 'none');
+                        $('#mainPage').attr('class', mainPageClassMax);
+                        layoutMainPage();
+                    }
+                });
+            }
+        });
+
+        var pageNav = $('#pageNav');
+        var footer = $('#footer');
+        $(window).scroll(function () {
+            if (pageNav.offset().top > 0) {
+                pageNav.get(0).classList.remove('page-nav-flat');
+                pageNav.get(0).classList.add('page-nav-cascade');
+            } else {
+                pageNav.get(0).classList.remove('page-nav-cascade');
+                pageNav.get(0).classList.add('page-nav-flat');
+            }
+
+            // alert($(window).height() + '-' + footer.offset().top);
+            // if (Math.ceil($(window).height() + $(document).scrollTop()) >= Math.ceil($(document).height())) {
+            //     showItem(loadingField);
+            //     loadPage(false);
+            // }
+        });
     });
 
 </script>

@@ -46,8 +46,13 @@ public class FileService {
                 map(item -> PathUtils.padSuffixSlash(item.getPath()) + item.getFileName()).
                 collect(Collectors.toList()));
         syncTask.refreshAll(refreshList);
-        return items.stream().map(FileResponse::buildFrom).sorted(Comparator.comparing(FileResponse::getFileName)).
-                collect(Collectors.toList());
+        return items.stream().map(FileResponse::buildFrom).sorted((o1, o2) -> {
+            int ret = o2.getType().compareTo(o1.getType());
+            if (ret == 0) {
+                ret = o1.getFileName().compareTo(o2.getFileName());
+            }
+            return ret;
+        }).collect(Collectors.toList());
     }
 
     public boolean fileRename(String path, String oldName, String newName) {
