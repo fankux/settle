@@ -13,6 +13,8 @@ public interface FileDao {
     Set<FileItem> selectDirItems(@Param("path") String path, @Param("start") Integer start,
                                  @Param("count") Integer count);
 
+    Set<FileItem> selectDirs(@Param("path") String path);
+
     int insert(FileItem item);
 
     int insertBatch(Set<FileItem> items);

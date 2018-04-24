@@ -31,6 +31,19 @@
         </if>
     </select>
 
+    <select id="selectDirs" resultMap="FileItemResultMap">
+        SELECT
+        id,
+        type,
+        path,
+        file_name AS fileName,
+        mtime,
+        extra_info AS extraInfo,
+        update_time AS updateTime
+        FROM file
+        WHERE path = #{path} AND type = 2
+    </select>
+
     <insert id="insert" parameterType="FileItem" keyProperty="id" useGeneratedKeys="true">
       INSERT OR IGNORE INTO file
         ('type', 'path', 'file_name', 'mtime', 'extra_info', 'update_time')

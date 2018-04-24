@@ -5,289 +5,70 @@
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
     <title>Home</title>
+    <link href="https://cdn.bootcss.com/material-design-icons/3.0.1/iconfont/material-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="webjars/bootstrap/css/bootstrap.min.css">
     <link rel="stylesheet" href="css/custom.css">
     <link rel="stylesheet" href="css/env.css">
     <link rel="stylesheet" href="css/baguetteBox.min.css">
-
-    <script type="text/javascript" src="webjars/jquery/jquery.min.js"></script>
-    <script type="text/javascript" src="webjars/bootstrap/js/bootstrap.min.js"></script>
-    <script type="text/javascript" src="webjars/masonry/masonry.pkgd.min.js"></script>
-    <script type="text/javascript" src="webjars/imagesloaded/imagesloaded.pkgd.min.js"></script>
-    <script type="text/javascript" src="webjars/velocity/velocity.min.js"></script>
-    <script type="text/javascript" src="js/baguetteBox.min.js" async></script>
-    <script type="text/javascript" src="js/inc.js"></script>
 </head>
 
 <body>
-<header class="nav sticky-top page-nav page-nav-flat" id="pageNav">
-    <button class="navbar-toggler sidebar-toggler" id="sidebarToggler" type="button" data-toggle="collapse"
-            data-target="#exCollapsingNavbar">
+<header class="navbar d-flex justify-content-start align-items-center sticky-top page-nav page-nav-flat"
+        id="pageNav">
+    <button class="navbar-toggler sidebar-toggler" id="sidebarToggler" type="button">
         &#9776;
     </button>
     <ol class="breadcrumb" id="pagePos">
         <li class="breadcrumb-item"><a href="javascript:void(0);" id="homeLink">Home</a></li>
     </ol>
+    <button class="navbar-toggler d-flex ml-auto asidebar-toggler" id="asidebarToggler" type="button">
+        <i class="material-icons">&#xE88F;</i>
+    </button>
 </header>
 <div class="container-fluid d-flex">
-    <nav class="col-12 col-md-3 col-lg-2 col-xl-2 flex-column sidebar" id="sidebar">
-        <ul class="nav flex-column sidebar-nav">
-            <li class="nav-item">aaaaaaaaaaaaaaaaaa</li>
-        </ul>
+    <nav class="col-8 col-md-3 col-lg-2 col-xl-2 flex-column sidebar" id="sidebar">
+        <nav class="navbar flex-column align-items-start sidebar-nav" id="currentSidePos">
+            <div class="navbar-nav flex-row w-100">
+                <a class="nav-link sidebar-arrow" href="javascript:toggleDir('subnav-1-1')">
+                    <svg class="align-middle" x="0px" y="0px" width="20px" height="20px" viewBox="0 0 20 20"
+                         focusable="false" fill="#000000">
+                        <polygon points="8,5 13,10 8,15"></polygon>
+                    </svg>
+                </a>
+                <a class="nav-link sidebar-item" href="javascript:void(0);">aaa</a>
+            </div>
+            <nav class="navbar flex-column w-100 align-items-start sidebar-nav-nest" id="subnav-1-1">
+                <div class="navbar-nav flex-row w-100">
+                    <a class="nav-link sidebar-arrow" href="javascript:toggleDir('subnav-2-1')">
+                        <svg class="align-middle" x="0px" y="0px" width="20px" height="20px" viewBox="0 0 20 20"
+                             focusable="false" fill="#000000">
+                            <polygon points="8,5 13,10 8,15"></polygon>
+                        </svg>
+                    </a>
+                    <a class="nav-link sidebar-item" href="javascript:void(0);">bbb</a>
+                </div>
+                <nav class="navbar flex-column w-100 align-items-start sidebar-nav-nest" id="subnav-2-1"></nav>
+            </nav>
+        </nav>
     </nav>
-    <main class="col-12 col-md-9 col-lg-10 col-xl-10 main-page" id="mainPage">
+    <main class="col-auto main-page" id="mainPage">
         <div class="gallery grid" id="imgListField">
             <div class="grid-sizer" id="gridSizer"></div>
             <div class="gutter-sizer"></div>
         </div>
     </main>
-    <aside class="hide"></aside>
+    <aside class="col-md-3 col-lg-2 col-xl-2 flex-column hide aside" id="aside">
+        bbbbbbbbbbbb
+    </aside>
 </div>
 <footer class="d-flex" id="footer">
     <button type="button" class="btn btn-light btn-lg btn-block" id="loadingField">加载更多</button>
 </footer>
 
+<script type="text/javascript" src="webjars/requirejs/2.3.5/require.min.js" data-main="js/main.js"></script>
+<script type="text/javascript" src="js/inc.js"></script>
 <script type="text/javascript">
-    var index = 0;
-    var loadFlag = false;
-    var anchor = 0;
-    var imgListField = $('#imgListField');
-    var loadingField = $('#loadingField');
-
-    var grid = imgListField.masonry({
-        itemSelector: '.grid-item',
-        columnWidth: '.grid-sizer',
-        gutter: '.gutter-sizer',
-        horizontalOrder: true
-    });
-
-    function genPagePosition(encodePath) {
-        var pagePos = $('#pagePos');
-        pagePos.html('<li><a href="' + getHost() + '" class="breadcrumb-item" id="homeLink">Home</a></li>');
-
-        var secPath = '';
-        var sec = decodeURI(encodePath).split('/');
-        for (var i = 0; i < sec.length; ++i) {
-            if (i === sec.length - 1) {
-                pagePos.append($('<li class="breadcrumb-item active">' + sec[i] + '</li>'));
-            } else {
-                pagePos.append($('<li class="breadcrumb-item"><a href="javascript:getPage(0, 20, \'' +
-                    secPath.replace(/\\/g, '\\\\') + '\', true, true);">' + sec[i] + '</a></li>'));
-                secPath += '/' + sec[i];
-            }
-        }
-    }
-
-    function renderPage(start, data, encodePath, modUrl, clear) {
-        var historyData = {
-            path: encodePath,
-            data: data,
-            anchor: anchor,
-            index: index
-        };
-
-        if (modUrl && clear) {          // load new list
-            setUrlParam('p', encodePath);
-        }
-
-        if (clear) {                    // refresh list
-            genPagePosition(encodePath);
-            imgListField.html('<div class="grid-sizer" id="gridSizer"></div><div class="gutter-sizer"></div>');
-            grid.masonry('reloadItems');
-        } else {                        // append list
-            var currentState = history.state;
-            if (currentState) {
-                historyData.data = currentState.data.concat(historyData.data);
-            }
-        }
-
-        var gridSizer = $('#gridSizer');
-
-        loadFlag = true;
-        if (data.length < 20) {
-            hiddenItem(loadingField);
-        } else {
-            showItem(loadingField);
-        }
-
-        // dir first
-        var i;
-        for (i = 0; i < data.length; ++i) {
-            if (!loadFlag) {
-                break;
-            }
-            if (data[i].type === 2) {
-                item = $('<a href="javascript:getPage(0, 20, \'' + data[i].src.replace(/\\/g, '\\\\') +
-                    '\', true, true);"><div class="card grid-item"><div class="card-body">' +
-                    '<h6 class="card-title">' + data[i].fileName + '</h6></div></a>');
-
-                grid.masonry().append(item).masonry('appended', item);
-            }
-        }
-
-        for (i = 0; i < data.length; ++i) {
-            if (!loadFlag) {
-                break;
-            }
-            var item;
-            if (data[i].type === 1) {
-                if (data[i].extraInfo !== '') {
-                    var extraInfo = JSON.parse(data[i].extraInfo);
-
-                    var w = gridSizer.width();
-                    var h = w * extraInfo.smHeight / extraInfo.smWidth;
-
-                    item = $('<div class="card grid-item">' +
-                        '<a href="/img' + data[i].src + '?raw=1"><img class="card-img thumbnail-img" alt="' +
-                        data[i].fileName + '" title="' + data[i].fileName + '" width="' + w + '" height="' + h +
-                        '" src="/img' + data[i].src + '" id="img-' + (index + i) + '">' + '</a></div>');
-
-                    grid.masonry().append(item).masonry('appended', item);
-                }
-            }
-        }
-        index += data.length;
-        historyData.index = index;
-        history.replaceState(historyData, '', '');
-
-        grid.masonry('layout');
-        // grid.imagesLoaded().progress(function () {
-        //     grid.masonry('layout');
-        // });
-
-        // remove specify size for image auto layout after
-        $('.thumbnail-img').removeAttr('width').removeAttr('height');
-
-        baguetteBox.run('.gallery', {
-            noScrollbars: true,
-            preload: 3,
-            async: true,
-            onChange: function (currentIndex, imagesCount) {
-                $('#baguetteBox-figure-' + currentIndex).click(function () {
-                    baguetteBox.hide();
-                });
-            }
-        });
-    }
-
-    function getPage(start, size, path, modUrl, clear) {
-        index = start;
-        $(document).attr("title", path);
-        var encodePath = encodeURI(path);
-        $.ajax({
-            url: './api/files?path=' + encodePath + '&s=' + start + '&c=' + size,
-            type: 'POST',
-            dataType: 'json',
-            contentType: 'application/json',
-            success: function (data) {
-                renderPage(start, data, encodePath, modUrl, clear);
-            },
-            error: function (XMLHttpRequest, textStatus, errorThrown) {
-            }
-        });
-    }
-
-    function loadPage(clear) {
-        var params = getUrlParams();
-        if (!params.hasOwnProperty('p')) {
-            getPage(index, 20, '', false, clear);
-        } else {
-            getPage(index, 20, decodeURI(params['p']).replace(/\\/g, '\\\\'), false, clear);
-        }
-    }
-
-    /**
-     * clear image list, load from server or history state
-     */
-    function reRenderPage() {
-        var state = history.state;
-        if (!state) {
-            loadPage(true);
-        } else {
-            renderPage(0, state.data, state.path, false, true);
-        }
-    }
-
-    function layoutMainPage() {
-        grid.masonry('layout');
-    }
-
-    // page back
-    $(window).bind("popstate", function () {
-        index = 0;
-        loadFlag = false;
-        stopLoadPage();
-        baguetteBox.hide();
-        showItem(loadingField);
-
-        reRenderPage();
-    });
-
-    // window resize
-    var resizeTm = null;
-    $(window).resize(function () {
-        if (resizeTm != null) {
-            clearTimeout(resizeTm);
-        }
-        resizeTm = setTimeout(function () {
-            layoutMainPage();
-        }, 200);
-    });
-
-    $(document).ready(function () {
-        $('#homeLink').attr('href', getHost());
-        loadPage(true);
-
-        loadingField.click(function () {
-            // showItem(loadingField);
-            loadPage(false);
-        });
-
-        // toggle sidebar
-        var mainPageClass = 'col-12 col-md-9 col-lg-10 col-xl-10 main-page';
-        var mainPageClassMax = 'col-12 main-page';
-        var sidebar = $('#sidebar');
-        $('#sidebarToggler').click(function () {
-            if (sidebar.css("display") === 'none') {
-                sidebar.css('display', 'block');
-                sidebar.velocity({translateX: ['0%', '-100%']}, {
-                    duration: 300,
-                    complete: function () {
-                        $('#mainPage').attr('class', mainPageClass);
-                        layoutMainPage();
-                    }
-                });
-            } else {
-                sidebar.velocity({translateX: '-100%'}, {
-                    duration: 300,
-                    complete: function () {
-                        sidebar.css('display', 'none');
-                        $('#mainPage').attr('class', mainPageClassMax);
-                        layoutMainPage();
-                    }
-                });
-            }
-        });
-
-        var pageNav = $('#pageNav');
-        var footer = $('#footer');
-        $(window).scroll(function () {
-            if (pageNav.offset().top > 0) {
-                pageNav.get(0).classList.remove('page-nav-flat');
-                pageNav.get(0).classList.add('page-nav-cascade');
-            } else {
-                pageNav.get(0).classList.remove('page-nav-cascade');
-                pageNav.get(0).classList.add('page-nav-flat');
-            }
-
-            // alert($(window).height() + '-' + footer.offset().top);
-            // if (Math.ceil($(window).height() + $(document).scrollTop()) >= Math.ceil($(document).height())) {
-            //     showItem(loadingField);
-            //     loadPage(false);
-            // }
-        });
-    });
-
+    require(['gallery'])
 </script>
 
 </body>

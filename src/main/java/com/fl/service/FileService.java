@@ -55,6 +55,13 @@ public class FileService {
         }).collect(Collectors.toList());
     }
 
+    public List<FileResponse> dirList(String path) {
+        Set<FileItem> items = fileDao.selectDirs(path);
+        return items.stream().map(FileResponse::buildFrom).
+                sorted(Comparator.comparing(FileResponse::getFileName)).
+                collect(Collectors.toList());
+    }
+
     public boolean fileRename(String path, String oldName, String newName) {
         File oldFile = new File(path, oldName);
         if (!oldFile.exists()) {

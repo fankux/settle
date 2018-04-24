@@ -21,6 +21,11 @@ public class FileApiController {
         return fileService.fileList(path, start, count);
     }
 
+    @RequestMapping("dirs")
+    List<FileResponse> dirList(@RequestParam("path") String path) {
+        return fileService.dirList(path);
+    }
+
     Boolean fileRename(@RequestParam("path") String path, @RequestParam("name") String name,
                        @RequestParam("newName") String newName) {
         return fileService.fileRename(path, name, newName);
