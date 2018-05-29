@@ -14,8 +14,6 @@ ON "file" (
   "file_name"
 );
 
-###########################################
-
 CREATE TABLE "sync_path" (
   "id" INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
   "path" TEXT NOT NULL DEFAULT ''
@@ -25,8 +23,6 @@ CREATE UNIQUE INDEX "sync_path_uniq_info"
 ON "sync_path" (
   "path"
 );
-
-###########################################
 
 CREATE TABLE "sync_status" (
   "key" TEXT NOT NULL,
@@ -39,6 +35,4 @@ ON "sync_status" (
   "value"
 );
 
-INSERT INTO sync_status("key", "value") VALUES ("flag", "true");
-
-###########################################
+INSERT INTO sync_status("key", "value") VALUES ("flag", "INIT");

@@ -36,15 +36,15 @@ import java.util.stream.Collectors;
 public class SyncTask {
     private static Logger logger = LoggerFactory.getLogger(SyncTask.class);
 
-    @Value("${settle.conf.defaultRootPath}")
-    String defaultRootPath;
-
     @Resource
     ImageService imageService;
     @Resource
     FileDao fileDao;
     @Resource
     SyncPathDao syncPathDao;
+
+    @Value("${settle.conf.defaultRootPath}")
+    String defaultRootPath;
 
     private Thread syncThread;
     private boolean syncFlag = false;
