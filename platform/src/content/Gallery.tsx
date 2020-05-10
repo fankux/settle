@@ -1,12 +1,22 @@
 import React from 'react';
-import {Card, Col, Drawer, Dropdown, Menu, Row} from 'antd';
-import {EllipsisOutlined} from '@ant-design/icons';
-import './Gallery.css'
+import {
+    Card, Col, Drawer, Dropdown,
+    Layout, Menu, Row, PageHeader, Button
+} from 'antd';
+import {
+    EllipsisOutlined,
+    PushpinOutlined,
+    PushpinTwoTone,
+    CloseOutlined
+} from '@ant-design/icons';
 import SubMenu from "antd/es/menu/SubMenu";
+import './Gallery.css'
 import 'photoswipe/dist/photoswipe.css'
 import 'photoswipe/dist/default-skin/default-skin.css'
 import * as PhotoSwipe from 'photoswipe/dist/photoswipe.min'
 import * as PhotoSwipeUI_Default from 'photoswipe/dist/photoswipe-ui-default.min'
+
+const {Content, Sider} = Layout;
 
 type LightBoxProps = {
     images: any,
@@ -70,34 +80,73 @@ type ImageCardProps = {
 }
 
 type ImageDrawerProps = {
-    imageDrawerVisible: boolean,
-    onCloseImageDrawer: any,
+    visible: boolean,
+    fixed: boolean,
+    onClose: any,
+    onFixed: any,
+    unFixed: any,
     images: any,
     currentId: number;
 }
 
 class ImageDrawer extends React.Component<ImageDrawerProps> {
     onClose = () => {
-        this.props.onCloseImageDrawer();
+        this.props.onClose();
     }
 
     render() {
+        if (this.props.currentId === 0) {
+            return (<div/>);
+        }
         const img = this.props.images[this.props.currentId];
-        return (
-            <div>
-                {this.props.currentId === 0 ? '' :
-                    <Drawer
-                        title={img.title} placement="right" mask={true}
-                        visible={this.props.imageDrawerVisible}
-                        onClose={this.onClose}
-                        closable={true}
-                        keyboard={true}
-                        destroyOnClose={true}
-                    >
-                    </Drawer>
-                }
-            </div>
-        );
+        if (this.props.fixed) {
+            return (
+                <Sider width={256} theme="light">
+                    <PageHeader
+                        backIcon={false}
+                        ghost={false}
+                        title={"文件详情"}
+                        extra={[
+                            <Button key={2} type="primary" onClick={this.props.unFixed}>
+                                <PushpinOutlined/>
+                            </Button>,
+                            <Button key={1} type={"link"} onClick={this.props.onClose}>
+                                <CloseOutlined/>
+                            </Button>
+                        ]}>
+                    </PageHeader>
+                </Sider>
+            );
+        } else {
+            return (
+                <Drawer
+                    style={{position: 'absolute'}}
+                    bodyStyle={{padding: 0}}
+                    maskStyle={{backgroundColor: 'rgba(0,0,0,0)'}}
+                    placement="right" mask={true}
+                    getContainer={false}
+                    visible={this.props.visible}
+                    onClose={this.onClose}
+                    closable={false}
+                    keyboard={true}
+                    destroyOnClose={true}
+                >
+                    <PageHeader
+                        backIcon={false}
+                        ghost={false}
+                        title={"文件详情"}
+                        extra={[
+                            <Button key={2} onClick={this.props.onFixed}>
+                                <PushpinTwoTone/>
+                            </Button>,
+                            <Button key={1} type={"link"} onClick={this.props.onClose}>
+                                <CloseOutlined/>
+                            </Button>
+                        ]}>
+                    </PageHeader>
+                </Drawer>
+            );
+        }
     }
 }
 
@@ -128,7 +177,7 @@ class ImageCard extends React.Component<ImageCardProps> {
         return (
             <Dropdown overlay={this.menu} trigger={['contextMenu']}>
                 <Card className="image-card" hoverable={true} bordered={false}
-                      size="small" style={{width: 240}}
+                      size="small" style={{width: 240}} bodyStyle={{padding: 0}}
                       title={this.props.meta.title}
                       extra={<EllipsisOutlined
                           key="ellipsis"
@@ -147,6 +196,7 @@ export class Gallery extends React.Component {
     state = {
         count: 10,
         drawerVisible: false,
+        drawerFixed: false,
         currentImageId: 0
     };
 
@@ -160,15 +210,29 @@ export class Gallery extends React.Component {
     closeImageDrawer = () => {
         this.setState({
             drawerVisible: false,
+            drawerFixed: false
+        });
+    };
+
+    fixedImageDrawer = (fixed) => {
+        this.setState({
+            drawerFixed: fixed,
         });
     };
 
     // TODO... request to server
     imageSrc = 'https://os.alipayobjects.com/rmsportal/QBnOOoLaAfKPirc.png';
     items = {
+        '0': {id: '0', title: '0000000', src: this.imageSrc, osrc: this.imageSrc, ow: 240, oh: 300},
         '1': {id: '1', title: '1111111', src: this.imageSrc, osrc: this.imageSrc, ow: 240, oh: 300},
         '2': {id: '2', title: '2222222', src: this.imageSrc, osrc: this.imageSrc, ow: 240, oh: 300},
         '3': {id: '3', title: '3333333', src: this.imageSrc, osrc: this.imageSrc, ow: 240, oh: 300},
+        '4': {id: '4', title: '4444444', src: this.imageSrc, osrc: this.imageSrc, ow: 240, oh: 300},
+        '5': {id: '5', title: '5555555', src: this.imageSrc, osrc: this.imageSrc, ow: 240, oh: 300},
+        '6': {id: '6', title: '6666666', src: this.imageSrc, osrc: this.imageSrc, ow: 240, oh: 300},
+        '7': {id: '7', title: '7777777', src: this.imageSrc, osrc: this.imageSrc, ow: 240, oh: 300},
+        '8': {id: '8', title: '8888888', src: this.imageSrc, osrc: this.imageSrc, ow: 240, oh: 300},
+        '9': {id: '9', title: '9999999', src: this.imageSrc, osrc: this.imageSrc, ow: 240, oh: 300},
     };
 
     initLightbox = () => {
@@ -205,22 +269,25 @@ export class Gallery extends React.Component {
         const self = this;
         let idx = 0;
         return ([
-            <div key="rows" id="gallery" className="gallery" style={{padding: 24, minHeight: 360}}>
-                <Row gutter={[8, 8]}>
-                    {Object.keys(this.items).map(function (key) {
-                        return <Col key={key}>
-                            <ImageCard meta={self.items[key]} index={idx++}
-                                       onShowImageDrawer={self.showImageDrawer}
-                                       onShowLightbox={self.showLightbox}/></Col>;
-                    })}
-                </Row>
-            </div>,
-            <LightBox key="lightbox" images={this.items} currentId={this.state.currentImageId}/>,
+            <Content key={"gallery"} className="gallery" style={{margin: '0 16px'}}>
+                <div key="rows" style={{padding: 24, minHeight: 360}}>
+                    <Row gutter={[8, 8]}>
+                        {Object.keys(this.items).map(function (key) {
+                            return <Col key={key}>
+                                <ImageCard meta={self.items[key]} index={idx++}
+                                           onShowImageDrawer={self.showImageDrawer}
+                                           onShowLightbox={self.showLightbox}/></Col>;
+                        })}
+                    </Row>
+                </div>
+                <LightBox key="lightbox" images={this.items} currentId={this.state.currentImageId}/>
+            </Content>,
             <ImageDrawer key="imageDrawer" images={this.items}
-                         currentId={this.state.currentImageId}
-                         onCloseImageDrawer={this.closeImageDrawer}
-                         imageDrawerVisible={this.state.drawerVisible}/>
-
+                         fixed={this.state.drawerFixed} currentId={this.state.currentImageId}
+                         onClose={this.closeImageDrawer}
+                         onFixed={this.fixedImageDrawer.bind(this, true)}
+                         unFixed={this.fixedImageDrawer.bind(this, false)}
+                         visible={this.state.drawerVisible}/>
         ]);
     }
 }
