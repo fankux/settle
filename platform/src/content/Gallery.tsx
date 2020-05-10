@@ -192,12 +192,14 @@ class ImageCard extends React.Component<ImageCardProps> {
     }
 }
 
+
 export class Gallery extends React.Component {
     state = {
         count: 10,
         drawerVisible: false,
         drawerFixed: false,
-        currentImageId: 0
+        currentImageId: 0,
+        scaleRate: 60
     };
 
     showImageDrawer = (id) => {
